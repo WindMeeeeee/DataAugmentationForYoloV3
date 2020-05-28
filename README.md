@@ -1,5 +1,6 @@
 ## How to use
 ------
+It is recommended to use the original anchors.
 1. use Colabeler(Chinese name:精灵标注助手) to annotate your data,finally ,create JSON files.(Warning:The name of Picture can't Contain 'Blank space','Underline'.you can use 'tools/delete_x_in_batches.bat' to solve this problem.Put this file to your picture,and double-click)
 
 2. Put all the json files(not 'output' folder.) in  'data/annotations'.
