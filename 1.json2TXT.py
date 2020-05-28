@@ -134,83 +134,88 @@ class dataProcess:
         useful_json=0
         wcount = 0
         wcount2=0
+        pic_num=0
         for json_name in json_names:
-            imgname = json_name[:-5] + ".jpg"
-            imgpath = os.path.join(self.img_dir, imgname)
-            whole_json=whole_json+1
-            if os.path.exists(imgpath)==1:
-                line = imgpath
-                jpath = os.path.join(json_dir, json_name)
-                f = open(jpath, encoding='utf-8')
-                j = json.load(f)
-                box_names = []
-                if j['labeled'] is False:
-                    if noannodst_savedir is not None:
-                        dst_file = os.path.join(noannodst_savedir, imgname)
-                        shutil.copyfile(imgpath, dst_file)
-                    info = imgname + ' is not labeled.'
-                    logger.warning(info)
-                    wcount += 1
-                    continue
-                else:
-                    useful_json=useful_json+1
-                    w, h = j['size']['width'], j['size']['height']
-                    ls = j['outputs']['object']
-                    for obj in ls:
-                        name, box = '', {}
-                        for objk in obj:
-                            if objk == 'name':
-                                name = obj[objk]
-                            else:
-                                box = obj[objk]
-
-                        if name not in classnames:
-                            classnames.append(name)
-                            # if name=='power':
-                            #     print('power:',imgname)
-                        if 'xmin' in box:
-                            xmin, ymin, xmax, ymax = max(box['xmin'], 0), max(box['ymin'], 0), min(box['xmax'], w - 1), min(
-                                box['ymax'], h - 1)
-                        else:
-                            xmin, ymin, xmax, ymax = 10000, 10000, 0, 0
-                            for key in box:
-                                if key[0] == 'x':
-                                    if box[key] < xmin:
-                                        xmin = box[key]
-                                    if box[key] > xmax:
-                                        xmax = box[key]
-                                elif key[0] == 'y':
-                                    if box[key] < ymin:
-                                        ymin = box[key]
-                                    if box[key] > ymax:
-                                        ymax = box[key]
-                                else:
-                                    info = json_name + ' has wrong box key(not x or y).'
-                                    logger.error(info)
-                                xmin, ymin, xmax, ymax = max(xmin, 0), max(ymin, 0), min(xmax, w - 1), min(
-                                    ymax, h - 1)
-                        if xmin >= xmax or ymin >= ymax:
-                            info = json_name + ' has wrong annotation.'
-                            logger.error(info)
-                            continue
-                        box_names.append([xmin, ymin, xmax, ymax, name])
-                        line = line + ' ' + str(classnames.index(name)) + ' ' + str(xmin) + ' ' + str(
-                            ymin) + ' ' + str(xmax) + ' ' + str(ymax)
-
-                    if len(box_names) == 0:
-                        continue
-                    annotations.append(line)
-                    f_anno.write(line)
-                    # logger.info(line)
-                    f_anno.write('\n')
+            try:
+                imgname = json_name[:-5] + ".jpg"
+                imgpath = os.path.join(self.img_dir, imgname)
+                whole_json=whole_json+1
+                if os.path.exists(imgpath)==1:
+                    line = imgpath
                     print(line)
-                    if labeled_img_savedir is not None:
-                        dst_file = os.path.join(labeled_img_savedir, imgname)
-                        color_table = get_color_table(len(classnames))
-                        # shutil.copyfile(imgpath, dst_file)
-                        save_labeled_img(imgpath, box_names, dst_file, classnames, color_table=color_table)
-            else:
-                wcount2=wcount2+1
+                    jpath = os.path.join(json_dir, json_name)
+                    f = open(jpath, encoding='utf-8')
+                    j = json.load(f)
+                    box_names = []
+                    if j['labeled'] is False:
+                        if noannodst_savedir is not None:
+                            dst_file = os.path.join(noannodst_savedir, imgname)
+                            shutil.copyfile(imgpath, dst_file)
+                        info = imgname + ' is not labeled.'
+                        logger.warning(info)
+                        wcount += 1
+                        continue
+                    else:
+                        useful_json=useful_json+1
+                        w, h = j['size']['width'], j['size']['height']
+                        ls = j['outputs']['object']
+                        for obj in ls:
+                            name, box = '', {}
+                            for objk in obj:
+                                if objk == 'name':
+                                    name = obj[objk]
+                                else:
+                                    box = obj[objk]
+
+                            if name not in classnames:
+                                classnames.append(name)
+                                # if name=='power':
+                                #     print('power:',imgname)
+                            if 'xmin' in box:
+                                xmin, ymin, xmax, ymax = max(box['xmin'], 0), max(box['ymin'], 0), min(box['xmax'], w - 1), min(
+                                    box['ymax'], h - 1)
+                            else:
+                                xmin, ymin, xmax, ymax = 10000, 10000, 0, 0
+                                for key in box:
+                                    if key[0] == 'x':
+                                        if box[key] < xmin:
+                                            xmin = box[key]
+                                        if box[key] > xmax:
+                                            xmax = box[key]
+                                    elif key[0] == 'y':
+                                        if box[key] < ymin:
+                                            ymin = box[key]
+                                        if box[key] > ymax:
+                                            ymax = box[key]
+                                    else:
+                                        info = json_name + ' has wrong box key(not x or y).'
+                                        logger.error(info)
+                                    xmin, ymin, xmax, ymax = max(xmin, 0), max(ymin, 0), min(xmax, w - 1), min(
+                                        ymax, h - 1)
+                            if xmin >= xmax or ymin >= ymax:
+                                info = json_name + ' has wrong annotation.'
+                                logger.error(info)
+                                continue
+                            box_names.append([xmin, ymin, xmax, ymax, name])
+                            line = line + ' ' + str(classnames.index(name)) + ' ' + str(xmin) + ' ' + str(
+                                ymin) + ' ' + str(xmax) + ' ' + str(ymax)
+
+                        if len(box_names) == 0:
+                            continue
+                        annotations.append(line)
+                        f_anno.write(line)
+                        # logger.info(line)
+                        f_anno.write('\n')
+                        
+                        if labeled_img_savedir is not None:
+                            dst_file = os.path.join(labeled_img_savedir, imgname)
+                            color_table = get_color_table(len(classnames))
+                            # shutil.copyfile(imgpath, dst_file)
+                            save_labeled_img(imgpath, box_names, dst_file, classnames, color_table=color_table)
+                else:
+                    wcount2=wcount2+1
+            except:
+                pic_num=pic_num+1
         f_anno.close()
         info = 'wrong pics(no lables):{}'.format(wcount)
         logger.info(info)
@@ -218,6 +223,7 @@ class dataProcess:
         print('useful information:{}'.format(useful_json))
         print(info)
         print('json exists no pictures number:{}'.format(wcount2))
+        print('number error!:{}'.format(pic_num))
         f_class = open(class_name_path, 'w')
         for cla in classnames:
             f_class.write(cla)
