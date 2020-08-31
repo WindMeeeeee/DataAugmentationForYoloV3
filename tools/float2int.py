@@ -2,17 +2,22 @@ import os
 import shutil
 #float 2 int
 
-file=open('predict.txt','r',encoding='utf-8')
+file=open('train_NEW.txt','r',encoding='utf-8')
 w= open('123.txt','w',encoding='utf-8')
-
+index=0
 for line in file.readlines():
     w.write(line.split(' ')[0])
-    w.write(' ')
+
     for i in range(1,len(line.split(' '))):
-        a=float(line.split(' ')[i])
-        b=str(int(a))
-        w.write(b)
-        w.write(' ')
+        for x in line.split(' ')[i].split(','):
+            if index==0:
+                w.write(' ')
+                index=1
+            else:
+                w.write(',')
+            aaa=str(int(float(x)))
+            w.write(aaa)
+        index=0
     w.write('\n')
 
 #one by one 
