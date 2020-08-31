@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 import json
 import os
 import shutil
@@ -138,6 +137,10 @@ class dataProcess:
         for json_name in json_names:
             try:
                 imgname = json_name[:-5] + ".jpg"
+                #adapt to ".jpeg"
+                if  not os.path.exists("./data/imgs/"+imgname):
+                    imgname=imgname.split('.jpg')[0]+'.jpeg'
+                
                 imgpath = os.path.join(self.img_dir, imgname)
                 whole_json=whole_json+1
                 if os.path.exists(imgpath)==1:
